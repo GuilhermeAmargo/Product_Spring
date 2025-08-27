@@ -1,4 +1,4 @@
-package com.senai.hello.entity;
+package com.senai.hello.entities;
 
 import java.io.Serializable;
 

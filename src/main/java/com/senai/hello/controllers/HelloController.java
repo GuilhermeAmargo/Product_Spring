@@ -1,4 +1,4 @@
-package com.senai.hello.controller;
+package com.senai.hello.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
