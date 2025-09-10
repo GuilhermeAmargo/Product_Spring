@@ -15,8 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.senai.hello.dtos.ProductRequest;
+import com.senai.hello.dtos.ProductResponse;
 import com.senai.hello.entities.Product;
 import com.senai.hello.services.ProductService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("products")
@@ -26,12 +30,12 @@ public class ProductController {
     private ProductService service;
 
     @GetMapping
-    public ResponseEntity<List<Product>> getProducts() {
+    public ResponseEntity<List<ProductResponse>> getProducts() {
         return ResponseEntity.ok(service.getProducts());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getProductById(id));
     }
 
@@ -42,20 +46,20 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> saveProduct(@RequestBody Product product) {
-        Product newProduct = service.saveProduct(product);
+    public ResponseEntity<ProductResponse> saveProduct(@Valid @RequestBody ProductRequest request) {
+        ProductResponse response = service.saveProduct(request);
 
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
-            .buildAndExpand(newProduct.getId())
+            .buildAndExpand(response.id())
             .toUri();
-        return ResponseEntity.created(location).body(newProduct);
+        return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        service.updateProduct(id, product);
+    public ResponseEntity<Void> updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequest request) {
+        service.updateProduct(id, request);
         return ResponseEntity.noContent().build();
     }
 

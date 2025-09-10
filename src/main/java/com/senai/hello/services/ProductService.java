@@ -5,7 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.senai.hello.dtos.ProductRequest;
+import com.senai.hello.dtos.ProductResponse;
 import com.senai.hello.entities.Product;
+import com.senai.hello.mappers.ProductMapper;
 import com.senai.hello.repositories.ProductRepository;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -16,12 +19,16 @@ public class ProductService {
     @Autowired
     private ProductRepository repository;
 
-    public List<Product>getProducts(){
-        return repository.findAll();
+    public List<ProductResponse>getProducts(){
+        return repository.findAll()
+        .stream()
+        .map(ProductMapper::toDTO)
+        .toList();
     }
 
-     public Product getProductById(long id) {
+     public ProductResponse getProductById(long id) {
         return repository.findById(id)
+                         .map(ProductMapper::toDTO)
                          .orElseThrow( ()-> new EntityNotFoundException("Produto não cadastrado"));
     }
     
@@ -34,14 +41,16 @@ public class ProductService {
         }
     }
     
-    public Product saveProduct(Product product) {
-        return repository.save(product);
+    public ProductResponse saveProduct(ProductRequest request) {
+        Product product = ProductMapper.toEntity(request);
+        Product savedProduct = repository.save(product);
+        return ProductMapper.toDTO(savedProduct);
     }
 
-    public void updateProduct(Long id, Product product) {
+    public void updateProduct(Long id, ProductRequest request) {
         Product aux = repository.getReferenceById(id);
-        aux.setName(product.getName());
-        aux.setPrice(product.getPrice());
+        aux.setName(request.name());
+        aux.setPrice(request.price());
 
         repository.save(aux);
     }
